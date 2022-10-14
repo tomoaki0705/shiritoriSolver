@@ -40,7 +40,7 @@ public:
     bool isVisited(unsigned int index) const
     {
         size_t vectorIndex = 0;
-        while (index < 64)
+        while (index >= 64)
         {
             index = index >> 6;
             vectorIndex++;
@@ -50,7 +50,7 @@ public:
     void setVisited(unsigned int index)
     {
         size_t vectorIndex = 0;
-        while (index < 64)
+        while (index >= 64)
         {
             index = index >> 6;
             vectorIndex++;
