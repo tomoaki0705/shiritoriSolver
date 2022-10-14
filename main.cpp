@@ -55,7 +55,7 @@ public:
             index = index >> 6;
             vectorIndex++;
         }
-        status[vectorIndex] = status[vectorIndex] & (1ULL << index);
+        status[vectorIndex] = status[vectorIndex] | (1ULL << index);
     }
     std::vector<uint64_t> status;
 };
