@@ -146,6 +146,7 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
             if (edges[i].s == it->currentVertex && (it->visitedEdges.isVisited(edges[i].index) == false))
             {
                 vertex* v = new vertex(edges[i].d, edges[i].index, it->visitedEdges);
+                v->previous = it;
                 currentVerteces.push_back(v);
             }
         }
@@ -156,6 +157,36 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
         recursiveHop(nameOfVertex, edges, history, currentHop + 1);
     }
     return 0;
+}
+
+void traverseHistory(vertex* v, std::vector<vertex*>& result)
+{
+    if (v->previous != NULL)
+    {
+        traverseHistory(v->previous, result);
+        result.push_back(v);
+    }
+    else
+    {
+        result.push_back(v);
+    }
+    return;
+}
+
+void traverseHistory(std::vector<std::vector<vertex*> >& history, const std::vector<std::string>& nameOfVertex)
+{
+    auto lastIndex = history.size() - 1;
+    for (auto&& it : history[lastIndex])
+    {
+        std::vector<vertex*> result;
+        traverseHistory(it, result);
+        for (size_t i = 0; i < result.size() - 1; i++)
+        {
+            std::cout << nameOfVertex[result[i]->currentVertex] << "->";
+        }
+        std::cout << nameOfVertex[result[result.size()-1]->currentVertex] << std::endl;
+    }
+
 }
 
 unsigned int searchMaxHop(const std::vector<std::string>& nameOfVertex, const std::vector<edge>& edges, unsigned int startIndex)
@@ -169,6 +200,7 @@ unsigned int searchMaxHop(const std::vector<std::string>& nameOfVertex, const st
     stub.push_back(init);
     history.push_back(stub);
     auto result = recursiveHop(nameOfVertex, edges, history, 1);
+    traverseHistory(history, nameOfVertex);
     delete init;
     return 0;
 }
