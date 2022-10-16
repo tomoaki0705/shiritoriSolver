@@ -42,17 +42,17 @@ public:
         size_t vectorIndex = 0;
         while (index >= 64)
         {
-            index = index >> 6;
+            index -= 64;
             vectorIndex++;
         }
-        return (status[vectorIndex] & (1ULL << index));
+        return ((status[vectorIndex] & (1ULL << index)) != 0);
     }
     void setVisited(unsigned int index)
     {
         size_t vectorIndex = 0;
         while (index >= 64)
         {
-            index = index >> 6;
+            index -= 64;
             vectorIndex++;
         }
         status[vectorIndex] = status[vectorIndex] | (1ULL << index);
@@ -64,7 +64,7 @@ class vertex_
 {
 public:
     unsigned int currentVertex;
-    struct vertex_* previous;
+    class vertex_* previous;
     bitPattern visitedEdges;
     vertex_(unsigned int currentVertex_, unsigned int maxIndex)
         : currentVertex(currentVertex_)
@@ -90,15 +90,11 @@ unsigned int addAndGetIndex(std::vector<std::string>& list, const std::string& n
     if (it == list.end())
     {
         list.push_back(needle);
-        return list.size() - 1;
+        return (unsigned int)(list.size() - 1);
     }
-    unsigned int index = 0;
-    for (size_t i = 0; i < list.size(); i++)
+    else
     {
-        if (list[i] == needle)
-        {
-            return i;
-        }
+        return (unsigned int)(it - list.begin());
     }
 }
 
@@ -121,7 +117,7 @@ void readEdges(const char* filename, std::vector<std::string>& nameOfVertex, std
         edges.push_back(station);
         lineCount++;
     }
-#ifdef _DEBUG && 0
+#if defined(_DEBUG) && 0
     size_t i = 0;
     for ( auto&& it : nameOfVertex )
     {
@@ -138,6 +134,7 @@ void readEdges(const char* filename, std::vector<std::string>& nameOfVertex, std
 
 unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const std::vector<edge>& edges, std::vector<std::vector<vertex*> >& history, unsigned int currentHop)
 {
+    std::cout << currentHop << std::endl;
     std::vector<vertex*> currentVerteces;
     for (auto&& it : history[currentHop - 1])
     {
@@ -155,6 +152,10 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
     {
         history.push_back(currentVerteces);
         recursiveHop(nameOfVertex, edges, history, currentHop + 1);
+    }
+    else
+    {
+        int a = 0;//debug purpose
     }
     return 0;
 }
@@ -192,7 +193,7 @@ void traverseHistory(std::vector<std::vector<vertex*> >& history, const std::vec
 unsigned int searchMaxHop(const std::vector<std::string>& nameOfVertex, const std::vector<edge>& edges, unsigned int startIndex)
 {
     std::vector<std::vector<vertex*>> history;
-    unsigned int maxIndex = edges.size();
+    unsigned int maxIndex = (unsigned int)edges.size();
 
     // list
     vertex *init = new vertex(startIndex, maxIndex);
@@ -210,6 +211,7 @@ int main(int argc, char**argv)
     std::vector<std::string> nameOfVertex;
     std::vector<edge> edges;
     readEdges("./graph.txt", nameOfVertex, edges);
+    //readEdges("../../../graph.txt", nameOfVertex, edges);
     searchMaxHop(nameOfVertex, edges, 0);
     return 0;
 }
