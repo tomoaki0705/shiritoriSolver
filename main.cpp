@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "CBitPattern.hpp"
 
 struct edge_
 {
@@ -14,51 +15,6 @@ struct edge_
 
 typedef struct edge_ edge;
 
-class bitPattern
-{
-public:
-    void setMaxIndex(unsigned int maxIndex)
-    {
-        unsigned int length = (maxIndex >> 6) + 1;
-        for (size_t i = 0; i < length; i++)
-        {
-            status.push_back(0);
-        }
-    }
-    bitPattern() {};
-    bitPattern(unsigned int maxIndex)
-    {
-        setMaxIndex(maxIndex);
-    }
-    bitPattern(const bitPattern& b)
-    {
-        for (auto&& it : b.status)
-        {
-            status.push_back(it);
-        }
-    }
-    bool isVisited(unsigned int index) const
-    {
-        size_t vectorIndex = 0;
-        while (index >= 64)
-        {
-            index -= 64;
-            vectorIndex++;
-        }
-        return ((status[vectorIndex] & (1ULL << index)) != 0);
-    }
-    void setVisited(unsigned int index)
-    {
-        size_t vectorIndex = 0;
-        while (index >= 64)
-        {
-            index -= 64;
-            vectorIndex++;
-        }
-        status[vectorIndex] = status[vectorIndex] | (1ULL << index);
-    }
-    std::vector<uint64_t> status;
-};
 
 class vertex_
 {
