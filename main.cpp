@@ -25,9 +25,7 @@ public:
     vertex_(unsigned int currentVertex_, unsigned int maxIndex)
         : currentVertex(currentVertex_)
         , previous(NULL)
-    {
-        visitedEdges = bitPattern(maxIndex);
-    };
+    { };
     vertex_(unsigned int currentVertex_, unsigned int currentEdge, bitPattern visitedEdges_)
         : currentVertex(currentVertex_)
         , visitedEdges(visitedEdges_)
@@ -92,15 +90,44 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
 {
     std::cout << currentHop << std::endl;
     std::vector<vertex*> currentVerteces;
+    std::vector<bitPattern> previousPattern;
+    std::vector<vertex*> previousPointers;
     for (auto&& it : history[currentHop - 1])
     {
         for (size_t i = 0; i < edges.size(); i++)
         {
             if (edges[i].s == it->currentVertex && (it->visitedEdges.isVisited(edges[i].index) == false))
             {
-                vertex* v = new vertex(edges[i].d, edges[i].index, it->visitedEdges);
-                v->previous = it;
-                currentVerteces.push_back(v);
+                auto it_status = std::find(previousPattern.begin(), previousPattern.end(), it->visitedEdges);
+                bool addNewHistory = false;
+                if (it->previous == NULL)
+                {
+                    addNewHistory = true;
+                }
+                else if (it_status == previousPattern.end())
+                {
+                    addNewHistory = true;
+                }
+                else
+                {
+                    auto pointersIndex = it_status - previousPattern.begin();
+                    if (previousPointers[pointersIndex] == it)
+                    {
+                        addNewHistory = true;
+                    }
+                }
+                if (addNewHistory)
+                {
+                    vertex* v = new vertex(edges[i].d, edges[i].index, it->visitedEdges);
+                    v->previous = it;
+                    currentVerteces.push_back(v);
+                    previousPattern.push_back(it->visitedEdges);
+                    previousPointers.push_back(it);
+                }
+                else
+                {
+                    int a = 0;
+                }
             }
         }
     }
@@ -166,8 +193,8 @@ int main(int argc, char**argv)
 {
     std::vector<std::string> nameOfVertex;
     std::vector<edge> edges;
-    readEdges("./graph.txt", nameOfVertex, edges);
-    //readEdges("../../../graph.txt", nameOfVertex, edges);
+    //readEdges("./graph.txt", nameOfVertex, edges);
+    readEdges("./graph-harder.txt", nameOfVertex, edges);
     searchMaxHop(nameOfVertex, edges, 0);
     return 0;
 }
