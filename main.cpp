@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "CBitPattern.hpp"
+#include <unordered_map>
 
 struct edge_
 {
@@ -22,6 +23,10 @@ public:
     unsigned int currentVertex;
     class vertex_* previous;
     bitPattern visitedEdges;
+    void makeHash(std::vector<uint64_t>& s, uint64_t vertexIndex)
+    {
+        visitedEdges.makeHash(s, vertexIndex);
+    }
     vertex_(unsigned int currentVertex_, unsigned int maxIndex)
         : currentVertex(currentVertex_)
         , previous(NULL)
@@ -90,7 +95,8 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
 {
     std::cout << currentHop << std::endl;
     std::vector<vertex*> currentVerteces;
-    std::vector<bitPattern> previousPattern;
+    //std::vector<bitPattern> previousPattern;
+    std::unordered_map<std::vector<uint64_t>, int> previousPattern;
     std::vector<vertex*> previousPointers;
     for (auto&& it : history[currentHop - 1])
     {
@@ -98,7 +104,10 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
         {
             if (edges[i].s == it->currentVertex && (it->visitedEdges.isVisited(edges[i].index) == false))
             {
-                auto it_status = std::find(previousPattern.begin(), previousPattern.end(), it->visitedEdges);
+                std::vector<uint64_t> s;
+                it->makeHash(s, edges[i].index);
+                //auto it_status = std::find(previousPattern.begin(), previousPattern.end(), it->visitedEdges);
+                auto it_status = previousPattern.find(s);
                 bool addNewHistory = false;
                 if (it->previous == NULL)
                 {
@@ -110,18 +119,15 @@ unsigned int recursiveHop(const std::vector<std::string>& nameOfVertex, const st
                 }
                 else
                 {
-                    auto pointersIndex = it_status - previousPattern.begin();
-                    if (previousPointers[pointersIndex] == it)
-                    {
-                        addNewHistory = true;
-                    }
+                    addNewHistory = false;
                 }
                 if (addNewHistory)
                 {
                     vertex* v = new vertex(edges[i].d, edges[i].index, it->visitedEdges);
                     v->previous = it;
                     currentVerteces.push_back(v);
-                    previousPattern.push_back(it->visitedEdges);
+                    //previousPattern.push_back(it->visitedEdges);
+                    previousPattern.at(s) = 1;
                     previousPointers.push_back(it);
                 }
                 else

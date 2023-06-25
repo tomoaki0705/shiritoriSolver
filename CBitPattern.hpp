@@ -14,6 +14,14 @@ public:
     bool isVisited(unsigned int index) const;
     void setVisited(unsigned int index);
     bool operator == (const bitPattern& a) const;
+    void makeHash(std::vector<uint64_t>& s, uint64_t vertexIndex)
+    {
+        for (auto&& it : status)
+        {
+            s.push_back(it);
+        }
+        s.push_back(vertexIndex);
+    };
 protected:
     std::vector<uint64_t> status;
 };
